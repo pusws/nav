@@ -1,0 +1,93 @@
+/* WebNav Hub - 高性能简化版样式 */
+
+/* === 省略了前面的基础样式变量和布局，直接添加性能优化 === */
+
+/* 最终性能优化 - 确保最佳流畅度 */
+* {
+  box-sizing: border-box;
+}
+
+/* 强制最大性能模式 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .link-card:hover {
+    transform: none !important;
+  }
+  
+  nav a:hover {
+    transform: none !important;
+  }
+  
+  .category-title:hover {
+    transform: none !important;
+  }
+}
+
+/* 低性能设备优化 */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .link-card {
+    transition: none;
+    will-change: auto;
+  }
+  
+  nav a {
+    transition: none;
+    will-change: auto;
+  }
+  
+  .category-title {
+    transition: none;
+    will-change: auto;
+  }
+  
+  body::before,
+  body::after {
+    display: none;
+  }
+  
+  .link-card::before,
+  .link-card::after {
+    display: none;
+  }
+}
+
+/* 极简模式 - 完全移除动画 */
+.performance-mode * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  will-change: auto !important;
+}
+
+.performance-mode .link-card:hover {
+  background-color: #f0f0f0;
+}
+
+.performance-mode nav a:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* 简化滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
