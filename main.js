@@ -48,7 +48,13 @@
     if (initial) setCurrent(initial);
   }
 
-  /* ---- 2. 返回顶部 --------------------------------------------------- */
+  /* ---- 2. 版权年份 --------------------------------------------------- */
+  const year = document.getElementById('copyright-year');
+  if (year) {
+    year.textContent = String(new Date().getFullYear());
+  }
+
+  /* ---- 3. 返回顶部 --------------------------------------------------- */
   const toTop = document.getElementById('back-to-top');
   const pageHeader = document.querySelector('body > header');
 
