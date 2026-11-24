@@ -31,7 +31,9 @@
 
     --accent: light-dark(var(--orange-500), var(--orange-400));
     --accent-strong: light-dark(var(--orange-600), var(--orange-400));
-    --accent-violet: light-dark(#8b5cf6, #a78bfa);
+    /* 标题只取焦橙色系的两端，保持与按钮/高亮同一色相 */
+    --title-from: var(--orange-400);
+    --title-to: light-dark(var(--orange-600), var(--orange-500));
     /* 焦点环：对浅/深两种表面都满足 3:1 的非文本对比度 */
     --focus-ring: light-dark(#b03a12, #ffb08f);
 
@@ -176,7 +178,7 @@
     line-height: 1.15;
     color: var(--accent);
     /* 渐变文字是纯装饰，用 background-clip 实现（不再跑持续动画） */
-    background-image: linear-gradient(135deg, var(--accent) 0%, var(--accent-violet) 100%);
+    background-image: linear-gradient(135deg, var(--title-from) 0%, var(--title-to) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -446,17 +448,18 @@
     padding: 1.75rem 1rem;
   }
 
-  /* 窄屏改为单行横向滚动，吸顶高度可预测，也不再吃掉三行垂直空间 */
   body > nav {
     padding: 1rem;
   }
 
+  /* 窄屏同样是自动换行：始终能看到全部分类，也避免裁切与横向滚动条 */
   body > nav ul {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scroll-padding-inline: 1rem;
+    gap: 0.6rem;
+  }
+
+  /* 导航可能折成两行，锚点留白相应加大 */
+  :root {
+    --sticky-offset: 9rem;
   }
 
   body > nav a {
