@@ -74,20 +74,27 @@
   color: white;
 }
 
-/* 简化滚动条 */
-::-webkit-scrollbar {
-  width: 8px;
+/* 简化滚动条：标准属性优先，旧版 WebKit 作为回退 */
+html {
+  scrollbar-color: #c1c1c1 #f1f1f1;
+  scrollbar-width: thin;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
+@supports not (scrollbar-color: auto) {
+  html {
+    scrollbar-width: auto;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
+  html::-webkit-scrollbar {
+    width: 8px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+  html::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
 }
