@@ -55,6 +55,8 @@
     --radius-card: 1.2rem;
     --radius-nav: 1.5rem;
     --radius-pill: 1.5rem;
+    /* 分类标题与链接网格共用的内边距：两者左边缘和首列卡片始终对齐 */
+    --grid-pad: 1rem;
     --sticky-offset: 6rem; /* 吸顶导航高度，用于锚点滚动留白 */
     --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
   }
@@ -278,7 +280,7 @@
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 7rem), 1fr));
     gap: 1rem;
     margin-block-end: 2rem;
-    padding: 1rem;
+    padding: var(--grid-pad);
     border: 1px solid var(--hairline-soft);
     border-radius: 1.5rem;
     background: var(--surface-inset);
@@ -287,7 +289,16 @@
   /* 首屏之外的整块分类延后渲染；contain-intrinsic-size 预留高度避免滚动跳动 */
   .link-grid ~ .link-grid {
     content-visibility: auto;
-    contain-intrinsic-size: auto 45rem;
+    contain-intrinsic-size: auto 20rem;
+  }
+
+  /* 条目多的分类给更贴近实际的预估高度，减少首次滚动时的位置跳动 */
+  #social-grid {
+    contain-intrinsic-size: auto 28rem;
+  }
+
+  #tools-grid {
+    contain-intrinsic-size: auto 96rem;
   }
 
   /* --- 链接卡片 ------------------------------------------------------- */
@@ -460,6 +471,7 @@
   /* 导航可能折成两行，锚点留白相应加大 */
   :root {
     --sticky-offset: 9rem;
+    --grid-pad: 0.9rem;
   }
 
   body > nav a {
@@ -477,7 +489,6 @@
 
   .link-grid {
     gap: 0.9rem;
-    padding: 0.9rem;
     border-radius: 1.25rem;
   }
 
@@ -499,10 +510,13 @@
     padding: 0.9rem 0.7rem;
   }
 
+  :root {
+    --grid-pad: 0.8rem;
+  }
+
   .link-grid {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 5.5rem), 1fr));
     gap: 0.7rem;
-    padding: 0.8rem;
   }
 
   .link-card {
