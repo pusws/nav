@@ -85,6 +85,8 @@
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
       "Noto Sans SC", sans-serif;
     font-size: 1rem;
+    /* 字体交换期间按主字体的 x-height 缩放回退字体，避免版面跳动（CLS） */
+    font-size-adjust: from-font;
     /* 行高无单位，随字号同比缩放 */
     line-height: 1.6;
     color: var(--text);
@@ -111,6 +113,23 @@
   h1,
   h2 {
     text-wrap: balance;
+  }
+
+  /* 图标精灵：不占布局，仅供 <use> 引用 */
+  .icon-sprite {
+    position: absolute;
+    inline-size: 0;
+    block-size: 0;
+    overflow: hidden;
+  }
+
+  /* 内联 SVG 图标：跟随文字颜色与字号，不会被 flex 压缩 */
+  .icon {
+    inline-size: 1em;
+    block-size: 1em;
+    flex: none;
+    fill: currentColor;
+    pointer-events: none;
   }
 
   /* 焦点指示统一使用 :focus-visible + outline，键盘用户一定能看到，鼠标用户不被打扰 */
@@ -191,6 +210,8 @@
     position: sticky;
     inset-block-start: 0;
     z-index: 100;
+    /* 原生滚动监听：浏览器自己标记当前分类（Chrome 140+，其余浏览器由 JS 兜底） */
+    scroll-target-group: auto;
     margin-block-end: 1.5rem;
     padding: 1.2rem 1rem;
     background: var(--surface-nav);
@@ -239,7 +260,8 @@
     box-shadow: var(--inset-key), var(--shadow-2);
   }
 
-  body > nav a[aria-current="true"] {
+  /* aria-current 由脚本写入，:target-current 由浏览器原生维护，两者共用同一套视觉状态 */
+  body > nav a:is([aria-current="true"], :target-current) {
     translate: 0 1px;
     border-color: var(--accent-strong);
     background: linear-gradient(to bottom, var(--accent), var(--accent-strong));
@@ -338,14 +360,14 @@
     transition-duration: 0.1s;
   }
 
-  .link-card i {
+  .link-card .icon {
     font-size: 1.5rem;
     line-height: 1;
     color: var(--text);
     transition: color 0.2s var(--ease);
   }
 
-  .link-card:hover i {
+  .link-card:hover .icon {
     color: var(--accent);
   }
 
@@ -524,7 +546,7 @@
     gap: 0.35rem;
   }
 
-  .link-card i {
+  .link-card .icon {
     font-size: 1.3rem;
   }
 
@@ -564,7 +586,7 @@
 /* 仅在用户要求减少动态效果时，去掉位移/缩放，保留颜色变化 */
 @media (prefers-reduced-motion: reduce) {
   body > nav a:hover,
-  body > nav a[aria-current="true"],
+  body > nav a:is([aria-current="true"], :target-current),
   .link-card:hover,
   .link-card:active {
     translate: none;
@@ -585,7 +607,7 @@
     color: CanvasText;
   }
 
-  body > nav a[aria-current="true"],
+  body > nav a:is([aria-current="true"], :target-current),
   footer nav a:hover,
   .back-to-top {
     forced-color-adjust: none;

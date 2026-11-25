@@ -26,10 +26,10 @@
 ## 技术栈
 
 - HTML5
-- CSS3 (自定义属性, Grid, Flexbox, 动画)
-- JavaScript (DOM 操作, 事件监听)
+- CSS3 (自定义属性, Grid, Flexbox, 动画, `light-dark()`, `content-visibility`)
+- JavaScript (IntersectionObserver, `scrollend`)
 - Google Fonts (Inter 字体)
-- Font Awesome (图标)
+- 内联 SVG 图标精灵（图形来自 Font Awesome Free 6.7.2，CC BY 4.0），不再依赖图标字体与第三方 CSS
 
 ## 使用说明
 
@@ -60,13 +60,16 @@
 
 ### 交互
 
-- **不监听 `scroll`**: 当前分类高亮和返回顶部按钮的显隐都用 `IntersectionObserver`。
-- **原生行为优先**: 卡片是 `<a>`，锚点跳转、平滑滚动、键盘操作全部由浏览器处理，JS 只剩约 50 行。
+- **不监听 `scroll`**: 当前分类高亮优先用浏览器原生的 `scroll-target-group` + `:target-current`（Chrome 140+），其余浏览器回退到 `IntersectionObserver`；返回顶部按钮同样用 `IntersectionObserver`。
+- **原生行为优先**: 卡片是 `<a>`，锚点跳转、平滑滚动、键盘操作全部由浏览器处理，JS 只保留约 70 行。
 
 ### 资源与样式
 
-- **无阻塞第三方样式**: Google Fonts 与 Font Awesome 以 `preload` + `onload` 方式加载；Font Awesome 固定版本并带 SRI 完整性校验。
+- **图标不再走字体**: 197 个图标改为文档内的 SVG 精灵（126 个 `<symbol>`，每个只保留实际用到的图形），一次传输、随首屏渲染、可用 `currentColor` 着色。按 6.7.2 版本实测，这省掉了 Font Awesome 的 `all.min.css`（73.9 KB，gzip 21.3 KB）与 solid / brands / regular 三套 webfont（158 + 119 + 25 = 302 KB），代价是 `index.html` 从 50 KB 增到 136 KB（gzip 6.1 KB → 33.5 KB）；首屏传输量净减约 296 KB，请求数减少 4 个，也不再需要第三方 CDN 与 SRI。
+- **单一外部依赖**: 只剩 Google Fonts；样式表很小且自带 `font-display: swap`，直接同步加载，避免 `preload` + `onload` 在慢网络下的图标/文字闪烁。
 - **精简字体请求**: 只请求实际用到的字重（400/500/600/800）。
+- **字体交换不跳动**: `font-size-adjust: from-font` 按主字体的 x-height 缩放回退字体，减少字体加载完成时的版面位移。
+- **内容安全策略**: 通过 meta CSP 只允许同源脚本、同源样式与 Google Fonts 的字体来源，页面内没有任何内联脚本/内联样式/内联事件处理器。
 - **标准滚动条**: 用 `scrollbar-color` / `scrollbar-width` 替代 `::-webkit-scrollbar`，仅在必要时回退。
 - **单层背景装饰**: 把两个全屏固定伪元素合成为一个。
 
@@ -89,6 +92,13 @@
 - **布局**: 可以调整 `.link-grid` 的 `grid-template-columns` 来改变卡片的排列方式。
 
 ## 更新日志
+
+### v4.0 - 按 Modern Web Guidance 全面优化
+- 图标从 Font Awesome webfont 改为内联 SVG 精灵，移除第三方图标 CSS、三套字体与 cdnjs 预连接
+- 当前分类高亮改用原生 `scroll-target-group` + `:target-current`，`IntersectionObserver` 作为回退，并用 `scrollend` 同步 `aria-current`
+- 字体加载简化为同步样式表（去掉 `preload` + 内联 `onload`），加入 `font-size-adjust: from-font`
+- 新增 meta CSP（同源脚本/样式 + Google Fonts 字体源）、`theme-color`（浅/深色各一）
+- 删除不再被引用的 `style_simplified.css`
 
 ### v3.0 - 现代 Web 平台版本
 - 卡片改为语义化链接，修复了链接无可访问名称、焦点环被裁剪的问题

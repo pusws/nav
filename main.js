@@ -1,9 +1,13 @@
 /* WebNav Hub — 交互脚本
  *
  * 卡片本身已经是 <a>，键盘 Tab / Enter 与平滑滚动都交给浏览器原生行为，
- * 这里只保留两件浏览器做不到的事：
- *   1. 滚动时高亮当前分类（IntersectionObserver，无 scroll 监听）
- *   2. 返回顶部按钮的显隐（观察页头是否离开视口，同样不监听 scroll）
+ * 这里只保留浏览器做不到（或还不能普遍做到）的三件事：
+ *   1. 滚动时高亮当前分类
+ *      - Chrome 140+ 用 CSS 的 scroll-target-group + :target-current 原生实现，
+ *        脚本只负责把状态同步到 aria-current（见 scrollspy 指南）
+ *      - 其余浏览器用 IntersectionObserver 兜底，不监听 scroll
+ *   2. 版权年份
+ *   3. 返回顶部按钮的显隐（观察页头是否离开视口，同样不监听 scroll）
  */
 (() => {
   const navLinks = Array.from(
@@ -11,19 +15,37 @@
   );
   const headings = Array.from(document.querySelectorAll('main .category-title[id]'));
 
-  /* ---- 1. 当前分类高亮 ---------------------------------------------- */
-  if (navLinks.length && headings.length && 'IntersectionObserver' in window) {
-    const visible = new Set();
+  const setCurrent = (id) => {
+    for (const link of navLinks) {
+      if (link.hash === `#${id}`) {
+        link.setAttribute('aria-current', 'true');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    }
+  };
 
-    const setCurrent = (id) => {
+  /* ---- 1. 当前分类高亮 ---------------------------------------------- */
+  const nativeScrollspy = 'supports' in CSS && CSS.supports('scroll-target-group: auto');
+
+  if (navLinks.length && nativeScrollspy) {
+    // 视觉状态由 :target-current 提供，这里只补上辅助技术需要知道的语义状态
+    const syncAriaCurrent = () => {
+      const current = document.querySelector('nav[aria-label="分类导航"] a:target-current');
       for (const link of navLinks) {
-        if (link.hash === `#${id}`) {
+        if (link === current) {
           link.setAttribute('aria-current', 'true');
         } else {
           link.removeAttribute('aria-current');
         }
       }
     };
+
+    syncAriaCurrent();
+    document.addEventListener('scrollend', syncAriaCurrent, { passive: true });
+    window.addEventListener('hashchange', syncAriaCurrent);
+  } else if (navLinks.length && headings.length && 'IntersectionObserver' in window) {
+    const visible = new Set();
 
     const observer = new IntersectionObserver(
       (entries) => {
